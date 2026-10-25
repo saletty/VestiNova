@@ -14,6 +14,8 @@ El primer incremento de CU09 ofrece las pantallas públicas `/catalogo` y `/cata
 
 El incremento limitado de CU14 permite descargar explícitamente el catálogo público completo en IndexedDB y consultarlo sin conexión, con búsqueda, paginación, detalle y fecha de descarga. La PWA prepara la apertura y recarga del catálogo en el mismo navegador y origen. No implementa el alcance académico de datos autorizados por empresa y usuario. La preparación en Windows, las comprobaciones manuales y las limitaciones están en [docs/CU14_OFFLINE.md](docs/CU14_OFFLINE.md).
 
+- Primer incremento limitado de CU08: reglas de stock y ajuste por recuento, contratos de autorización y unidad de trabajo, con adaptadores en memoria exclusivos de pruebas. Sin API, UI ni persistencia integradas; alcance en [docs/CONTRATO_INVENTARIO.md](docs/CONTRATO_INVENTARIO.md).
+
 ## Estructura
 
 ```text

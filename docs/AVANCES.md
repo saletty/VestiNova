@@ -4,6 +4,7 @@
 
 ## Terminado
 
+- Primer incremento limitado de CU08: dominio inmutable, ajuste por recuento y contratos de autorización/unidad de trabajo verificables con adaptadores en memoria solo de pruebas. Sin conexión con API, UI, PostgreSQL o autenticación actual; [contrato y alcance pendiente](CONTRATO_INVENTARIO.md).
 - Estructura independiente Angular/FastAPI/SQLAlchemy/PostgreSQL, configuraciones y dependencias fijadas.
 - Base nueva `vestinova_mvp`, con Alembic `0001_base`; inicialización repetible sin borrar registros.
 - Configuración `.env` privada y creación local del administrador con entrada de contraseña oculta y hash Argon2. El usuario confirmó la creación del administrador del MVP.
@@ -55,6 +56,16 @@ Comprobaciones ejecutadas el 25 de octubre de 2026 en `miguel`, con Node.js 24.1
 La prueba de navegador descargó 121 productos de prueba en dos páginas y verificó que una actualización fallida conserva productos y fecha; un `403` no permite consultar la copia; el catálogo y un detalle no visitado se abren sin red; otra pestaña conserva la consulta; Cache Storage no contiene respuestas API; y la ausencia de copia tiene mensaje propio. Los fixtures solo existen en el servidor temporal de la prueba: no se utilizó FastAPI ni PostgreSQL, ni se insertaron registros operativos.
 
 Los módulos administrativos, el backend, las migraciones y los diagramas ICONIX permanecen sin cambios. No se hicieron commits ni push. El [procedimiento manual](CU14_OFFLINE.md) explica cómo comprobar el build PWA desde el navegador y diferencia este incremento público del CU14 académico completo.
+
+## Verificación del primer incremento de CU08
+
+- Núcleo y contratos nuevos en `backend/app/inventory/`, sin registro de rutas, modelos ORM ni integración de autenticación.
+- `python -m pytest tests -q --tb=short`: 266 pruebas correctas, incluidas 178 nuevas de CU08 (148 de dominio y 30 de servicio).
+- `npm.cmd test`: 168 pruebas de frontend correctas para conservar CU09 y CU14.
+- Las pruebas de CU08 verifican cantidades, cálculo de disponible, ajustes por recuento, autorización por contrato, referencias incompatibles, trazabilidad y conservación de saldo/movimientos ante fallos simulados.
+- No se modificaron frontend, módulos administrativos, tablas, migraciones ni diagramas; no se ejecutaron migraciones ni se hicieron commits o push. La persistencia y concurrencia PostgreSQL siguen pendientes.
+
+Reglas y límites en [CONTRATO_INVENTARIO.md](CONTRATO_INVENTARIO.md).
 
 ## Pendiente
 
