@@ -10,12 +10,12 @@
       </a>
     </nav>
     <div class="rail__session">
-      @if (auth.user(); as administrator) { <div class="rail__user"><strong>{{ administrator.nombre }}</strong><span>{{ administrator.correo }}</span><small>Administrador</small></div> }
+      @if (auth.user(); as administrator) { <div class="rail__user"><strong>{{ administrator.nombre }}</strong><span>{{ administrator.correo }}</span><small>{{ companies.canManage() ? 'Administración de empresa' : companies.active() ? 'Consulta de productos' : 'Acceso autenticado' }}</small></div> }
       <button type="button" class="rail__logout" (click)="logout()" [disabled]="signingOut()">{{ signingOut() ? 'Cerrando sesión…' : 'Cerrar sesión' }}</button>
     </div>
   </aside>
   <div class="workspace__body">
-    <header class="workspace__header"><span>Tu colección, al día.</span><span class="workspace__private">Espacio de gestión</span></header>
+    <header class="workspace__header"><div class="workspace__company"><span class="workspace__company-label">Empresa de trabajo</span><strong>{{ companies.active()?.nombre ?? 'Selecciona una empresa' }}</strong>@if (companies.active(); as company) { <span class="workspace__company-role">{{ company.rol === 'ADMINISTRADOR' ? 'Administración' : 'Solo consulta' }}</span> }</div><a routerLink="/admin/empresa" class="workspace__change">{{ companies.active() ? 'Cambiar empresa' : 'Elegir empresa' }}</a></header>
     <main id="main-content" class="workspace__main" tabindex="-1">
       @if (logoutError(); as message) { <p class="vn-alert vn-alert--error" role="alert">{{ message }}</p> }
       <router-outlet />
