@@ -1,0 +1,24 @@
+<div class="workspace">
+  <a href="#main-content" class="workspace__skip">Saltar al contenido</a>
+  <aside class="rail" aria-label="Administración VestiNova">
+    <a routerLink="/admin/productos" class="rail__brand" aria-label="VestiNova · Productos"><span class="rail__seal" aria-hidden="true">VN</span><span>VestiNova</span></a>
+    <p class="rail__label">Administración</p>
+    <nav class="rail__nav" aria-label="Navegación administrativa">
+      <a routerLink="/admin/productos" routerLinkActive="rail__link--active" ariaCurrentWhenActive="page" class="rail__link">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m7 4 5 3 5-3 4 5-4 3v8H7v-8L3 9z" /></svg>
+        Productos
+      </a>
+    </nav>
+    <div class="rail__session">
+      @if (auth.user(); as administrator) { <div class="rail__user"><strong>{{ administrator.nombre }}</strong><span>{{ administrator.correo }}</span><small>Administrador</small></div> }
+      <button type="button" class="rail__logout" (click)="logout()" [disabled]="signingOut()">{{ signingOut() ? 'Cerrando sesión…' : 'Cerrar sesión' }}</button>
+    </div>
+  </aside>
+  <div class="workspace__body">
+    <header class="workspace__header"><span>Tu colección, al día.</span><span class="workspace__private">Espacio de gestión</span></header>
+    <main id="main-content" class="workspace__main" tabindex="-1">
+      @if (logoutError(); as message) { <p class="vn-alert vn-alert--error" role="alert">{{ message }}</p> }
+      <router-outlet />
+    </main>
+  </div>
+</div>

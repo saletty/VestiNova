@@ -1,0 +1,47 @@
+<main class="access">
+  <section class="access__identity" aria-labelledby="access-intro">
+    <div class="access__brand"><span class="access__seal" aria-hidden="true">VN</span><span>VestiNova</span></div>
+    <div class="access__editorial">
+      <p class="access__eyebrow">Moda, con intención</p>
+      <h2 id="access-intro">Tu colección.<br /><em>Tu siguiente paso.</em></h2>
+      <p>Un espacio claro para organizar los productos de VestiNova.</p>
+    </div>
+    <p class="access__signature">El detalle hace la diferencia.</p>
+  </section>
+  <section class="access__panel" aria-labelledby="access-title">
+    <span class="access__area">Administración</span>
+    <div class="access__form-wrap">
+      <p class="vn-eyebrow">Acceso privado</p>
+      <h1 id="access-title" class="vn-title">Bienvenido<br />a VestiNova.</h1>
+      <p class="access__description">Ingresa con tu cuenta de administrador.</p>
+      @if (notice) { <p class="vn-alert" role="status">{{ notice }}</p> }
+      @if (error(); as message) { <p class="vn-alert vn-alert--error" role="alert">{{ message }}</p> }
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="sending()">
+        <div class="vn-field">
+          <label for="login-email">Correo electrónico</label>
+          <input id="login-email" name="username" type="email" formControlName="correo" autocomplete="username"
+            inputmode="email" autocapitalize="none" spellcheck="false" required maxlength="254"
+            placeholder="correo@ejemplo.com" [attr.aria-invalid]="invalid('correo')"
+            [attr.aria-describedby]="invalid('correo') ? 'login-email-error' : null" />
+          @if (invalid('correo')) { <p id="login-email-error" class="vn-field__error">Ingresa un correo electrónico válido.</p> }
+        </div>
+        <div class="vn-field">
+          <label for="login-password">Contraseña</label>
+          <div class="access__password">
+            <input id="login-password" name="password" [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password" autocomplete="current-password" required placeholder="Ingresa tu contraseña"
+              [attr.aria-invalid]="invalid('password')" [attr.aria-describedby]="invalid('password') ? 'login-password-error' : null" />
+            <button type="button" class="access__show" (click)="togglePassword()"
+              [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="showPassword()" aria-controls="login-password">{{ showPassword() ? 'Ocultar' : 'Mostrar' }}</button>
+          </div>
+          @if (invalid('password')) { <p id="login-password-error" class="vn-field__error">Ingresa tu contraseña.</p> }
+        </div>
+        <button type="submit" class="vn-button vn-button--primary access__submit" [disabled]="sending()">
+          @if (sending()) { <span class="vn-spinner" aria-hidden="true"></span> Ingresando… } @else { Iniciar sesión <span aria-hidden="true">→</span> }
+        </button>
+      </form>
+    </div>
+    <p class="access__footer">VestiNova · Espacio de gestión</p>
+  </section>
+</main>
