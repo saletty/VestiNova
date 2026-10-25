@@ -8,7 +8,7 @@ export interface Company {
   nombre: string;
   slug: string;
   activo: boolean;
-  rol: 'ADMINISTRADOR' | 'OPERADOR';
+  rol: 'ADMINISTRADOR' | 'ENCARGADO_SUCURSAL' | 'CAJERO' | 'OPERADOR';
 }
 
 export const COMPANY_KEY = 'vestinova_mvp_empresa';
@@ -24,6 +24,7 @@ export class CompanyService {
   readonly error = signal<string | null>(null);
   readonly revision = signal(0);
   readonly canManage = computed(() => this.active()?.rol === 'ADMINISTRADOR');
+  readonly canViewProducts = computed(() => ['ADMINISTRADOR', 'OPERADOR'].includes(this.active()?.rol ?? ''));
   private readonly changed = new Subject<number>();
   readonly changes$ = this.changed.asObservable();
   private userId: number | null = null;
@@ -133,7 +134,7 @@ export class CompanyService {
   private validCompany(value: unknown): value is Company {
     if (!value || typeof value !== 'object') return false;
     const item = value as Company;
-    return Number.isSafeInteger(item.id) && item.id > 0 && typeof item.nombre === 'string' && typeof item.slug === 'string' && item.activo === true && ['ADMINISTRADOR', 'OPERADOR'].includes(item.rol);
+    return Number.isSafeInteger(item.id) && item.id > 0 && typeof item.nombre === 'string' && typeof item.slug === 'string' && item.activo === true && ['ADMINISTRADOR', 'ENCARGADO_SUCURSAL', 'CAJERO', 'OPERADOR'].includes(item.rol);
   }
 
   private remembered(): { usuario_id: number; empresa_id: number } | null {

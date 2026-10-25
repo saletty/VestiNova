@@ -37,8 +37,8 @@ Fuente: lista proporcionada expresamente por el usuario el 25 de octubre de 2026
 
 Salet tiene CU01–CU07, CU12 y CU13. Miguel tiene CU08–CU11; se respeta su trabajo de catálogo y detalle. Los responsables de CU14–CU28 están **por confirmar**: no se asignan automáticamente a ninguno de los dos integrantes.
 
-El avance actual se limita a selector de empresa y flujo administrativo básico de CU05, conectado a CU01. La base de inventario ya implementada es soporte compartido para CU08, no autorización para desarrollar o modificar las pantallas de Miguel en este bloque.
+El avance acumulado incluye selector de empresa, flujo administrativo de CU05 y cuenta/acceso de CU01 en web y Flutter propio. El usuario reportó login/restauración/cierre Android para Cliente y una cuenta de personal mixta SaaS/Administrador empresarial; la aceptación de CU01 sigue parcial por cobertura pendiente de otros perfiles y recorridos. La base de inventario es soporte compartido para CU08, sin autorización para modificar las pantallas de Miguel. CU02 se retomará cuando el usuario confirme el push de `salet`.
 
-Esta tabla enumera el alcance acordado del proyecto; no declara implementados sus casos ni supone que los 28 deban demostrarse en la primera presentación. La priorización de avances no elimina las obligaciones expresas del enunciado. El alcance móvil identificado en ALCANCE_MOVIL_SEGUNDO_PARCIAL.md continúa pendiente, con Flutter pospuesto y sin reducir sus requisitos.
+Esta tabla enumera el alcance acordado; no declara implementados sus casos ni supone que los 28 deban demostrarse en la primera presentación. La priorización no elimina obligaciones del enunciado. Flutter propio cubre cuenta/acceso de CU01; SQLite comercial, catálogo local, reservas/ventas offline y sincronización continúan pendientes. No se renumeran casos ni se cambian actores, plataformas o responsables.
 
-El estado de la parte de Salet distingue backend, pantallas, pruebas y faltantes. La correspondencia histórica «CU05 productos/CU07 compras/CU12 empresas/CU13 planes» conserva utilidad para localizar documentos, pero los títulos vigentes son exclusivamente los de esta tabla.
+El [README](../README.md) resume lo ejecutable; los contratos compartidos describen la API. Los informes de avance y evidencias se conservan localmente. Los títulos vigentes son exclusivamente los de esta tabla.

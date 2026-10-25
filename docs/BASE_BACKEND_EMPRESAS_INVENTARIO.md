@@ -44,7 +44,7 @@ Se conservan login/me/logout y su respuesta actual. El rol técnico `ADMINISTRAD
 | --- | --- |
 | Superadministración de plataforma | Crear empresas con un administrador inicial existente y cambiar su estado activo. No accede a sus productos/inventario sin pertenencia. |
 | Pertenencia `ADMINISTRADOR` | Gestionar su empresa, productos, variantes, sucursales y pertenencias; registrar movimientos; acceder a todas las sucursales activas de esa empresa. |
-| Pertenencia `OPERADOR` | Consultar productos de la empresa y consultar/descargar solo sucursales activas asignadas. No modifica productos, variantes, pertenencias ni inventario. |
+| Pertenencia `OPERADOR`, `ENCARGADO_SUCURSAL` o `CAJERO` | Consultar productos de la empresa y consultar/descargar solo sucursales activas asignadas. Este bloque no habilita escritura de productos, variantes, pertenencias o inventario para esos roles. |
 
 Se rechaza con `404` el acceso a IDs de productos, variantes o sucursales no disponibles en el contexto, sin revelar recursos ajenos. Las relaciones compuestas en PostgreSQL impiden mezclar sucursal/producto/variante/pertenencia de empresas diferentes, incluso al insertar datos directamente. La membresía del responsable también se referencia desde el historial.
 
@@ -67,7 +67,7 @@ Todos requieren sesión; las operaciones administrativas comprueban la autoridad
 | `GET /api/admin/pertenencias` | Administración empresarial; usuarios, roles, estado y permisos explícitos de sucursal de su empresa. |
 | `POST /api/admin/pertenencias` | Administración empresarial; crea/actualiza `{administrador_id,rol,activo,sucursal_ids}` para una cuenta existente. Reemplaza los permisos de sucursal. |
 
-Para un `ADMINISTRADOR`, `sucursal_ids` debe estar vacío porque accede a todas las sucursales activas propias. Para un `OPERADOR`, una lista vacía no autoriza sucursales. Nunca se aceptan IDs de sucursal de otra empresa. No existe registro público de cuentas ni se incluyen correos/hashes en listas de pertenencias.
+Para `ADMINISTRADOR`, `sucursal_ids` debe estar vacío porque accede a todas las sucursales activas propias. Para `OPERADOR`, `ENCARGADO_SUCURSAL` y `CAJERO`, una lista vacía no autoriza sucursales. Nunca se aceptan IDs de otra empresa. No hay registro público de personal ni correos/hashes en las listas de pertenencias. El [registro público Cliente](CONTRATO_CU01_CUENTAS.md) es independiente y no concede permisos de personal.
 
 ## Provisionamiento local de cuentas
 
@@ -89,11 +89,11 @@ $SucursalId = Read-Host 'ID de la sucursal autorizada de esa empresa'
 
 `--sucursal-id` se puede repetir. Omitir `--empresa-id` crea la pertenencia en el entorno inicial; no omitirlo para una cuenta de otra empresa. Para una empresa nueva, la superadministración puede crearla con una cuenta administrativa existente como responsable inicial; luego provisionar la nueva cuenta con el ID de esa empresa. Las pertenencias adicionales o su retiro se gestionan explícitamente, conservando un administrador activo. No hay flujo web de invitación/aceptación ni alta conjunta de empresa y cuenta.
 
-El frontend ya tiene selector `/admin/empresa` y añade `X-Empresa-Id` al flujo básico de CU05 **Gestionar catálogo de prendas**. No hay formularios de organizaciones/inventario: esas operaciones se prueban mediante Swagger y su autorización de servidor. No se modificaron pantallas de Miguel. El subflujo CU01/CU05 distingue lo implementado de las pruebas visuales pendientes.
+El frontend tiene selector `/admin/empresa` y añade `X-Empresa-Id` al flujo de CU05 **Gestionar catálogo de prendas**. No hay formularios de organizaciones/inventario: esas operaciones se consultan mediante Swagger y su autorización de servidor. No se modificaron pantallas de Miguel. Ver [contrato público](CONTRATO_CATALOGO.md) y [cuenta/acceso](CONTRATO_CU01_CUENTAS.md).
 
 ## Variantes, saldos y movimientos
 
-Cada producto pertenece a una empresa. Una variante identifica talla y color normalizados a mayúsculas, combinación única dentro del producto, incluidas variantes inactivas. No tiene precio independiente: hereda el precio vigente del producto, decimal exacto en BOB. La ampliación de CU05 permite corregir talla/color antes de que exista una fila de existencias o un movimiento asociado; después conserva esa identidad histórica, incluso cuando el saldo sea cero. El estado activo sí puede cambiar sin reescribir la identidad. El formulario y la política de edición se describen en CU05_VARIANTES.md; no incorpora movimientos ni pantallas de CU08.
+Cada producto pertenece a una empresa. Una variante identifica talla y color normalizados a mayúsculas, combinación única dentro del producto, incluidas variantes inactivas. No tiene precio independiente: hereda el precio vigente del producto, decimal exacto en BOB. `PATCH /api/admin/variantes/{id}` admite talla/color/estado; corrige identidad solo antes de que exista una fila de existencias o un movimiento asociado. Después devuelve `409` ante cambios de identidad, incluso con saldo cero. El estado activo sí puede cambiar. No incorpora movimientos ni pantallas de CU08.
 
 Las existencias se llevan por empresa, sucursal y variante. **No hay endpoint para sobrescribir la cantidad.** Se usa `POST /api/admin/inventario/movimientos` con ID UUID, sucursal, variante, `ENTRADA`/`SALIDA`, cantidad positiva y motivo. El servidor toma el responsable de la sesión y deriva el signo.
 
@@ -113,7 +113,7 @@ No se agregan variantes, stock ni pertenencias al JSON público consumido por Mi
 
 ## Verificación y pendientes
 
-Pruebas automatizadas en bases aisladas: cuentas y productos de dos empresas; permisos por sucursal; cambio/revocación de pertenencia; manipulación de IDs; ausencia de sesión; formato público; ledger/saldo; reintentos; rechazo de salidas excesivas; descarga autorizada. PostgreSQL temporal verifica además upgrade de esquema poblado y concurrencia real. Resultados concretos en AVANCES.md.
+Pruebas automatizadas en bases aisladas: cuentas/productos de dos empresas, permisos por sucursal, cambio/revocación de pertenencia, IDs ajenos, ausencia de sesión, contrato público, ledger/saldo, reintentos, rechazo de salidas excesivas y descarga autorizada. PostgreSQL temporal verifica migración con datos y concurrencia real. Son pruebas de API, no acreditan pantallas comerciales completas.
 
 Para repetir, desde `backend`:
 
@@ -124,6 +124,6 @@ Para repetir, desde `backend`:
 
 Las pruebas PostgreSQL crean su propia instancia temporal en otro puerto y no usan las credenciales ni registros operativos. Los datos ficticios de prueba no se insertan en la base del usuario.
 
-Pendientes: clientes mínimos, abastecimiento, reservas, ventas offline, SQLite/Flutter propio, PWA, sincronización/recepción comercial, políticas de conflictos y planes/suscripciones. Flutter queda pospuesto por prioridad, sin reducir su alcance. No se aplican todavía límites o vigencia de suscripciones; `empresa.activo` no equivale a un plan contratado. La propuesta de sincronización es un contrato por acordar, no endpoints disponibles. Respetar CU08–CU11 de Miguel y confirmar responsables de CU14–CU28 antes de asignarlos.
+Pendientes: abastecimiento, reservas, ventas offline, SQLite comercial, PWA, sincronización/recepción comercial, conflictos y planes/suscripciones. La cuenta Cliente y Flutter de CU01 existen; no completan esas operaciones. La sincronización comercial todavía no tiene endpoints acordados. `empresa.activo` no equivale a un plan contratado. Respetar CU08–CU11 de Miguel y confirmar responsables de CU14–CU28 antes de asignarlos.
 
 Fundamento técnico: [bloqueos de fila PostgreSQL](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS) y [transacciones de lectura SQLAlchemy](https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#setting-read-only-deferrable).

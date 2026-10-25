@@ -21,7 +21,20 @@ export const companyAdminGuard: CanActivateFn = () => {
   return auth.ensureSession().pipe(
     switchMap(user => user ? companies.ensureForUser(user.id).pipe(map(() => {
       if (!companies.active()) return router.createUrlTree(['/admin/empresa']);
-      return companies.canManage() ? true : router.createUrlTree(['/admin/productos'], { queryParams: { motivo: 'permiso' } });
+      return companies.canManage() ? true : router.createUrlTree([companies.canViewProducts() ? '/admin/productos' : '/admin/acceso'], { queryParams: { motivo: 'permiso' } });
+    })) : of(router.createUrlTree(['/admin/login']))),
+    catchError(() => of(router.createUrlTree(['/admin/empresa']))),
+  );
+};
+
+export const productsGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const companies = inject(CompanyService);
+  const router = inject(Router);
+  return auth.ensureSession().pipe(
+    switchMap(user => user ? companies.ensureForUser(user.id).pipe(map(() => {
+      if (!companies.active()) return router.createUrlTree(['/admin/empresa']);
+      return companies.canViewProducts() ? true : router.createUrlTree(['/admin/acceso']);
     })) : of(router.createUrlTree(['/admin/login']))),
     catchError(() => of(router.createUrlTree(['/admin/empresa']))),
   );

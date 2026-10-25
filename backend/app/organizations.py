@@ -44,7 +44,7 @@ class EmpresaResponse(BaseModel):
 
 
 class EmpresaAccesoResponse(EmpresaResponse):
-    rol: Literal["ADMINISTRADOR", "OPERADOR"]
+    rol: Literal["ADMINISTRADOR", "OPERADOR", "ENCARGADO_SUCURSAL", "CAJERO"]
 
 
 class SucursalCreate(Input):
@@ -82,7 +82,7 @@ class SucursalResponse(BaseModel):
 
 class PertenenciaCreate(Input):
     administrador_id: int = Field(gt=0, strict=True)
-    rol: Literal["ADMINISTRADOR", "OPERADOR"]
+    rol: Literal["ADMINISTRADOR", "OPERADOR", "ENCARGADO_SUCURSAL", "CAJERO"]
     activo: bool = Field(default=True, strict=True)
     sucursal_ids: list[Annotated[int, Field(gt=0, strict=True)]] = Field(default_factory=list, max_length=100)
 
@@ -103,7 +103,7 @@ class PertenenciaCreate(Input):
 class PertenenciaResponse(BaseModel):
     administrador_id: int
     empresa_id: int
-    rol: Literal["ADMINISTRADOR", "OPERADOR"]
+    rol: Literal["ADMINISTRADOR", "OPERADOR", "ENCARGADO_SUCURSAL", "CAJERO"]
     activo: bool
     sucursal_ids: list[int]
 

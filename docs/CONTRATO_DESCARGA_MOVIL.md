@@ -2,7 +2,7 @@
 
 Versión del contrato: **1.0**. Bloque de backend para web y futuro móvil, 25 de octubre de 2026. Este documento describe la descarga; no implementa la aplicación Flutter, reservas, ventas offline ni sincronización de operaciones.
 
-Prioridad actual: Flutter pospuesto, conservando sus requisitos. Según [CASOS_DE_USO.md](CASOS_DE_USO.md), esta descarga es base compartida para CU14 **Preparar información para operar sin conexión**, con responsable por confirmar. El inventario ya disponible es soporte de CU08 **Gestionar inventario por sucursal**, de Miguel; este contrato no habilita modificar sus pantallas ni declara completo ese caso.
+Flutter propio cubre cuenta/acceso de CU01; la persistencia comercial offline sigue pendiente. Según [CASOS_DE_USO.md](CASOS_DE_USO.md), esta descarga es base compartida para CU14 **Preparar información para operar sin conexión**, con responsable por confirmar. El inventario es soporte de CU08 **Gestionar inventario por sucursal**, de Miguel; este contrato no declara completo ese caso ni modifica sus pantallas.
 
 ## Identidad, empresa y sucursales
 
@@ -11,7 +11,7 @@ El acceso conserva `POST /api/auth/login`, `GET /api/auth/me` y `POST /api/auth/
 Enviar `X-Empresa-Id` cuando el usuario tenga varias pertenencias activas. Si se omite y existe una sola empresa activa autorizada, el backend la selecciona para conservar el flujo web actual. Con más de una devuelve `409`; sin pertenencia activa devuelve `403`. Un ID enviado en la cabecera no concede acceso.
 
 - Una membresía `ADMINISTRADOR` permite administrar productos e inventario de su empresa y consultar sus sucursales activas.
-- Una membresía `OPERADOR` solo consulta y descarga las sucursales activas que tenga asignadas. Este bloque no le permite registrar movimientos de inventario.
+- Las membresías `OPERADOR`, `ENCARGADO_SUCURSAL` y `CAJERO` solo consultan y descargan las sucursales activas asignadas. Este bloque no les permite registrar movimientos de inventario.
 - La superadministración de plataforma no evita la comprobación de pertenencia para descargar información empresarial.
 - Empresa o pertenencia inactiva impiden descargar. La revocación o los cambios de permisos se comprueban en cada petición online.
 
@@ -163,14 +163,14 @@ Ejemplo ilustrativo de movimiento:
 
 El primer registro devuelve `201`; reenviar el mismo ID y contenido con el mismo usuario devuelve `200` y el movimiento original, sin aplicar otro cambio. Reutilizar el ID con otros datos devuelve `409`. Corregir un ingreso se hace con otro movimiento compensatorio y motivo, nunca editando/eliminando el historial. El alta de una variante no inventa unidades iniciales. La idempotencia de este movimiento administrativo no equivale a una API de sincronización de ventas o reservas ya implementada.
 
-La ampliación de CU05 para editar variantes no cambia el formato de esta descarga ni el catálogo público. Talla/color mantienen límites 30/60, normalización de espacios exteriores y mayúsculas y unicidad dentro de la prenda, incluidas variantes inactivas. Una corrección de identidad referenciada —incluso con saldo cero— devuelve `409`; se conserva la original y se crea otra variante cuando corresponda. No hay traslado automático de inventario. El flujo y sus pruebas se documentan en CU05_VARIANTES.md.
+La edición de variantes no cambia esta descarga ni el catálogo público. Talla/color mantienen límites 30/60, normalización exterior/mayúsculas y unicidad por prenda, incluidas variantes inactivas. Una identidad referenciada, incluso con saldo cero, devuelve `409` al intentar corregirla; se conserva la original y se crea otra variante cuando corresponda. No hay traslado automático de inventario.
 
 ## Integración y trabajo compartido
 
 - El contrato público de Miguel conserva `GET /api/catalogo/productos`, paginación `{items,total,limit,offset}`, detalle por `slug`, precio como cadena y `BOB`. Esta descarga no sustituye esas rutas ni requiere cambiar sus pantallas.
 - Las respuestas públicas solo incluyen los datos publicados; no exponen pertenencias, sucursales internas o movimientos. La selección futura de tienda/tenant público y una posible evolución de la unicidad del slug deben acordarse aparte.
 - Flutter propio y PWA pueden consumir esta descarga privada según sus permisos y usar sus mecanismos locales de persistencia distintos. No hay una app móvil nueva ejecutable por el mero hecho de existir este contrato.
-- Se respeta el reparto confirmado: Salet CU01–CU07, CU12 y CU13; Miguel CU08–CU11, incluidas compra digital y reservas. Flutter, preparación offline/sincronización y los restantes CU14–CU28 siguen por confirmar. Definir interfaces y dependencias no asigna automáticamente estos últimos a Miguel ni implica que todos deban entrar en la primera presentación.
-- Para la API del móvil: emulador Android `http://10.0.2.2:8001/api`; teléfono por LAN `http://IP_LAN_DE_LA_PC:8001/api`, con backend accesible por esa interfaz. Ver EJECUCION_Y_API.md.
+- Se respeta el reparto: Salet CU01–CU07, CU12 y CU13; Miguel CU08–CU11. La asignación de CU14–CU28 sigue por confirmar. Definir interfaces no asigna esos casos a Miguel ni implica su entrega completa en la primera presentación.
+- API móvil: emulador Android `http://10.0.2.2:8001/api`; teléfono LAN `http://IP_LAN_DE_LA_PC:8001/api`, con backend accesible. Ver [mobile/README.md](../mobile/README.md).
 
-Referencias: [contrato público](CONTRATO_CATALOGO.md), alcance académico y propuesta de sincronización pendiente.
+Referencias: [contrato público](CONTRATO_CATALOGO.md), [cuenta/acceso](CONTRATO_CU01_CUENTAS.md) y [base empresarial](BASE_BACKEND_EMPRESAS_INVENTARIO.md). La sincronización comercial requiere un contrato posterior; esta descarga no la implementa.

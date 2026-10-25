@@ -2,6 +2,8 @@
 
 Acuerdo inicial de integración, 25 de octubre de 2026. Este documento propone el contrato para que ambos integrantes trabajen sobre una API común; no implica una aceptación externa del compañero.
 
+**Ampliación aditiva de CU01 para coordinar con Miguel:** [CONTRATO_CU01_CUENTAS.md](CONTRATO_CU01_CUENTAS.md) define registro/login/cuenta por tienda pública (`/tienda/{slug}/acceso`). El servidor asigna exclusivamente Cliente y valida la tienda; no se usa el selector de personal. No se cambian los endpoints ni campos de producto siguientes. El catálogo actual continúa agregado: acordar con Miguel cómo obtener el slug de tienda y enlazar sus pantallas, sin añadir ni asumir un campo empresarial inexistente en el JSON del producto. No se modificó su frontend ni se afirma que ya integró los enlaces.
+
 ## Responsabilidades
 
 - Salet: CU01 **Gestionar cuenta y acceso al sistema** y CU05 **Gestionar catálogo de prendas** en el subflujo administrativo de este contrato; su responsabilidad total es CU01–CU07, CU12 y CU13.
@@ -59,7 +61,7 @@ Validaciones: nombre entre 3 y 120 caracteres; descripción de hasta 3000; slug 
 
 Requieren `Authorization: Bearer TOKEN`, sesión vigente y administrador activo, comprobados por el servidor.
 
-La API administrativa comprueba además pertenencia activa a empresa. `X-Empresa-Id` selecciona una empresa autorizada; con una sola pertenencia se conserva la selección automática, con varias la omisión devuelve `409`. La consulta permite pertenencia `ADMINISTRADOR` u `OPERADOR`; el alta y edición requieren `ADMINISTRADOR` empresarial. No se aceptan propietarios arbitrarios en el payload. Los cuerpos y respuestas de producto permanecen compatibles. Ver [base empresarial e inventario](BASE_BACKEND_EMPRESAS_INVENTARIO.md).
+La API administrativa comprueba además pertenencia activa a empresa. `X-Empresa-Id` selecciona una empresa autorizada; con una sola pertenencia se conserva la selección automática, con varias la omisión devuelve `409`. La consulta admite las pertenencias de personal `ADMINISTRADOR`, `ENCARGADO_SUCURSAL`, `CAJERO` y `OPERADOR`; el alta y edición requieren `ADMINISTRADOR` empresarial. No se aceptan propietarios arbitrarios en el payload. Los cuerpos y respuestas de producto permanecen compatibles. Ver [base empresarial e inventario](BASE_BACKEND_EMPRESAS_INVENTARIO.md).
 
 | Método y ruta | Operación |
 | --- | --- |

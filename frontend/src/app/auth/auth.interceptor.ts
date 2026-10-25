@@ -10,7 +10,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const router = inject(Router);
   const companies = inject(CompanyService);
   const path = request.url.split('?')[0];
-  const companyApi = path.startsWith('/api/admin/') || path.startsWith('/api/movil/');
+  const companyApi = path.startsWith('/api/admin/') || path.startsWith('/api/movil/') || path === '/api/auth/contexto';
   const privateApi = companyApi || path === '/api/empresas' || path.startsWith('/api/plataforma/') || ['/api/auth/me', '/api/auth/logout'].includes(path);
   const token = auth.token();
   const selected = companies.active();

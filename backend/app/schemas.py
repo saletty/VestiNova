@@ -29,6 +29,7 @@ class AdministradorResponse(BaseModel):
     correo: str
     rol: Literal["ADMINISTRADOR"] = "ADMINISTRADOR"
     activo: bool
+    es_superadministrador: bool = False
 
 
 class LoginResponse(BaseModel):

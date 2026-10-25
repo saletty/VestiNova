@@ -85,7 +85,7 @@ class Sucursal(Base):
 
 class MembresiaEmpresa(Base):
     __tablename__ = "membresias_empresa"
-    __table_args__ = (CheckConstraint("rol IN ('ADMINISTRADOR', 'OPERADOR')", name="ck_membresias_rol"),)
+    __table_args__ = (CheckConstraint("rol IN ('ADMINISTRADOR', 'OPERADOR', 'ENCARGADO_SUCURSAL', 'CAJERO')", name="ck_membresias_rol"),)
 
     administrador_id: Mapped[int] = mapped_column(ForeignKey("administradores.id"), primary_key=True)
     empresa_id: Mapped[int] = mapped_column(ForeignKey("empresas.id"), primary_key=True)
@@ -158,3 +158,27 @@ class MovimientoInventario(Base):
     delta: Mapped[int] = mapped_column(Integer, nullable=False)
     saldo_resultante: Mapped[int] = mapped_column(Integer, nullable=False)
     creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class Cliente(Base):
+    """Una identidad de cliente independiente por tienda, nunca una cuenta de personal."""
+    __tablename__ = "clientes"
+    __table_args__ = (UniqueConstraint("empresa_id", "correo", name="uq_clientes_empresa_correo"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    empresa_id: Mapped[int] = mapped_column(ForeignKey("empresas.id"), nullable=False, index=True)
+    nombre: Mapped[str] = mapped_column(String(120), nullable=False)
+    correo: Mapped[str] = mapped_column(String(254), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class SesionCliente(Base):
+    __tablename__ = "sesiones_cliente"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    cliente_id: Mapped[int] = mapped_column(ForeignKey("clientes.id", ondelete="CASCADE"), nullable=False, index=True)
+    creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    expira_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    revocada: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)

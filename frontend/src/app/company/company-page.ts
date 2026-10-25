@@ -18,6 +18,10 @@ export class CompanyPage {
   readonly error = signal<string | null>(null);
   readonly navigating = signal(false);
 
+  roleLabel(role: string): string {
+    return ({ ADMINISTRADOR: 'Administración', ENCARGADO_SUCURSAL: 'Encargado de sucursal', CAJERO: 'Cajero', OPERADOR: 'Consulta' } as Record<string, string>)[role] ?? role;
+  }
+
   ngOnInit(): void {
     const user = this.auth.user();
     if (!user || this.companies.error()) return;
@@ -35,8 +39,8 @@ export class CompanyPage {
     if (!this.companies.select(Number(this.candidate()))) { this.error.set('Selecciona una empresa de la lista para continuar.'); return; }
     this.navigating.set(true);
     try {
-      if (!await this.router.navigate(['/admin/productos'])) this.error.set('La empresa está seleccionada. Intenta abrir Productos nuevamente.');
-    } catch { this.error.set('No pudimos abrir Productos. Inténtalo nuevamente.'); }
+      if (!await this.router.navigate([this.companies.canViewProducts() ? '/admin/productos' : '/admin/acceso'])) this.error.set('La empresa está seleccionada. Intenta continuar nuevamente.');
+    } catch { this.error.set('No pudimos abrir tu espacio. Inténtalo nuevamente.'); }
     finally { this.navigating.set(false); }
   }
 }

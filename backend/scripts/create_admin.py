@@ -1,4 +1,4 @@
-"""Alta explícita de administrador; nunca guarda ni imprime contraseña en claro."""
+"""Alta explícita de personal; nunca guarda ni imprime contraseña en claro."""
 import argparse
 from getpass import getpass
 import sys
@@ -16,8 +16,8 @@ from app.security import hash_password, verify_password
 def main(argv: list[str] | tuple[str, ...] = ()) -> None:
     parser = argparse.ArgumentParser(description="Crea una cuenta local y su pertenencia explícita a empresa.")
     parser.add_argument("--empresa-id", type=int, help="Empresa activa; por defecto el entorno inicial de migración.")
-    parser.add_argument("--rol", choices=["ADMINISTRADOR", "OPERADOR"], default="ADMINISTRADOR")
-    parser.add_argument("--sucursal-id", action="append", type=int, default=[], help="Sucursales autorizadas de un operador; se puede repetir.")
+    parser.add_argument("--rol", choices=["ADMINISTRADOR", "OPERADOR", "ENCARGADO_SUCURSAL", "CAJERO"], default="ADMINISTRADOR")
+    parser.add_argument("--sucursal-id", action="append", type=int, default=[], help="Sucursales autorizadas del encargado, cajero u operador; se puede repetir.")
     parser.add_argument("--superadministrador", action="store_true", help="Concede gestión de plataforma; no evita la pertenencia a empresa.")
     args = parser.parse_args(argv)
     if args.empresa_id is not None and args.empresa_id <= 0:
@@ -27,10 +27,10 @@ def main(argv: list[str] | tuple[str, ...] = ()) -> None:
     if any(branch_id <= 0 for branch_id in args.sucursal_id) or len(set(args.sucursal_id)) != len(args.sucursal_id):
         raise ValueError("Las sucursales deben ser identificadores positivos sin duplicados.")
     settings = Settings.from_env()
-    nombre = input("Nombre del administrador: ").strip()
+    nombre = input("Nombre de la cuenta de personal: ").strip()
     if not 3 <= len(nombre) <= 120:
         raise ValueError("El nombre debe tener entre 3 y 120 caracteres.")
-    correo = normalizar_correo(input("Correo del administrador: "))
+    correo = normalizar_correo(input("Correo de la cuenta de personal: "))
     print(PASSWORD_POLICY_MESSAGE)
     password = getpass("Contraseña nueva (oculta): ")
     confirmacion = getpass("Repite la contraseña (oculta): ")
@@ -63,7 +63,7 @@ def main(argv: list[str] | tuple[str, ...] = ()) -> None:
             for branch_id in args.sucursal_id:
                 db.add(AccesoSucursal(administrador_id=administrator.id, empresa_id=company.id, sucursal_id=branch_id))
             db.commit()
-            print("Administrador creado con hash Argon2 y contraseña verificada.")
+            print("Administrador creado con hash Argon2 y contraseña verificada." if args.rol == "ADMINISTRADOR" else "Cuenta de personal creada con hash Argon2 y contraseña verificada.")
             print(f"Cuenta ID {administrator.id}; empresa ID {company.id}; rol {args.rol}.")
             if administrator.es_superadministrador:
                 print("La cuenta tiene gestión de plataforma; sus accesos comerciales siguen requiriendo pertenencia.")

@@ -2,7 +2,7 @@
 
 Monorepositorio propio: FastAPI/SQLAlchemy/PostgreSQL en `backend/`, Angular en `frontend/`, Flutter en `mobile/` y contratos en `docs/`. No incorpora código ni historial heredados. Utiliza exclusivamente la base local `vestinova_mvp`.
 
-Esta base incluye acceso de personal, empresas/sucursales, selector y gestión de prendas/variantes. La cuenta Cliente y Flutter propio se agregan en el siguiente avance.
+Cuenta/acceso de personal y Cliente por tienda en web y Flutter propio. Correo Cliente único por empresa; Argon2 y sesiones revocables. El personal selecciona empresa después del login. CU01 mantiene aceptación parcial por verificaciones pendientes de actores/recorridos.
 
 ## Preparación local — PowerShell
 
@@ -31,6 +31,7 @@ npm.cmd start
 ```
 
 - Personal: http://127.0.0.1:4201/admin/login
+- Cliente: http://127.0.0.1:4201/tienda/vestinova-inicial/acceso
 - API/Swagger: http://127.0.0.1:8001/docs
 - Salud y PostgreSQL: http://127.0.0.1:8001/api/health/db
 
@@ -40,6 +41,7 @@ Angular usa `/api` y su proxy apunta a `127.0.0.1:8001`. No iniciar otra instanc
 
 - [Casos de uso y responsables](docs/CASOS_DE_USO.md).
 - [Catálogo y detalle públicos](docs/CONTRATO_CATALOGO.md): paginación, slug, precio decimal como cadena y moneda BOB.
+- [Cuenta y acceso por tienda](docs/CONTRATO_CU01_CUENTAS.md).
 - [Empresas, pertenencias, sucursales e inventario](docs/BASE_BACKEND_EMPRESAS_INVENTARIO.md).
 - [Descarga privada, existencias y movimientos](docs/CONTRATO_DESCARGA_MOVIL.md).
 
