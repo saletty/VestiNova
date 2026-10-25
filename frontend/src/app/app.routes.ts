@@ -4,6 +4,14 @@ import { adminGuard, guestGuard } from './auth/auth.guards';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'admin/productos' },
   {
+    path: 'catalogo',
+    loadComponent: () => import('./catalog/catalog-layout').then(m => m.CatalogLayout),
+    children: [
+      { path: '', pathMatch: 'full', loadComponent: () => import('./catalog/catalog-list').then(m => m.CatalogListPage) },
+      { path: ':slug', loadComponent: () => import('./catalog/catalog-detail').then(m => m.CatalogDetailPage) },
+    ],
+  },
+  {
     path: 'admin/login', canActivate: [guestGuard],
     loadComponent: () => import('./auth/login-page').then(m => m.LoginPage),
   },

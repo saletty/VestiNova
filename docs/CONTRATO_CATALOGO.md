@@ -5,7 +5,7 @@ Acuerdo inicial de integración, 25 de octubre de 2026. Este documento propone e
 ## Responsabilidades
 
 - Integrante 1: autenticación de administrador, API y formularios administrativos para registrar, editar y listar productos; migraciones y persistencia.
-- Compañero: pantallas públicas de catálogo y detalle, consumiendo los endpoints siguientes. Sus pantallas todavía no están implementadas.
+- Integrante 2, rama `miguel`: pantallas públicas de catálogo y detalle, consumiendo los endpoints siguientes. El primer incremento de CU09 implementa `/catalogo` y `/catalogo/{slug}`, con búsqueda por nombre, paginación y estados de carga, vacío, error y producto no disponible.
 - Ambas partes: conservar nombres, tipos y semántica del contrato. Proponer cambios aquí y actualizar las pruebas antes de modificar respuestas.
 
 ## Endpoints públicos
@@ -73,3 +73,9 @@ Alta: `nombre`, `descripcion`, `precio`; opcionales `slug`, `imagen_url`, `activ
 - Errores de dominio: `{ "detail": "Mensaje" }`; errores de entrada FastAPI: `detail` es una lista con `loc` y `msg`. No mostrar mensajes SQL ni trazas al usuario.
 
 El catálogo no necesita token. No debe consumir `/api/admin/*` ni guardar credenciales del administrador. Desactivar un producto lo retira de las consultas públicas.
+
+## Pantallas del primer incremento de CU09
+
+El frontend utiliza exclusivamente los dos GET públicos anteriores. Conserva `precio` como cadena decimal y presenta el importe en bolivianos; utiliza la imagen recibida o una alternativa sin fotografía si falta o no se puede cargar. El estado `activo` representa publicación, no existencias.
+
+Este incremento no incorpora filtros adicionales, variantes, empresas, promociones, disponibilidad por sucursal, compras ni almacenamiento offline. No modifica el esquema de PostgreSQL, la autenticación, las pantallas administrativas ni los diagramas ICONIX. El caso académico completo sigue pendiente de las integraciones con CU05, CU06, CU08 y CU14.

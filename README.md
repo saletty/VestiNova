@@ -8,9 +8,9 @@ Repositorio acordado: **`saletty/VestiNova`**; colaborador: `jerezsuarezmiguelan
 
 ## Alcance
 
-Implementado: inicio/restauración/cierre de sesión de administrador; protección de rutas y API; listado, registro y edición de productos; API pública para el catálogo y detalle; migración inicial versionada y creación local del administrador con hash Argon2.
+Implementado: inicio/restauración/cierre de sesión de administrador; protección de rutas y API; listado, registro y edición de productos; catálogo público con búsqueda por nombre, paginación y detalle; migración inicial versionada y creación local del administrador con hash Argon2.
 
-Pendiente del compañero: pantallas públicas de catálogo y detalle. Su contrato está en [docs/CONTRATO_CATALOGO.md](docs/CONTRATO_CATALOGO.md). La raíz del frontend conduce al acceso administrativo hasta que se integre esa parte. No se presentan compras, inventario, pagos, reservas ni SaaS como funciones del MVP.
+El primer incremento de CU09 ofrece las pantallas públicas `/catalogo` y `/catalogo/{slug}`, conforme a [docs/CONTRATO_CATALOGO.md](docs/CONTRATO_CATALOGO.md). Muestra datos publicados, precios BOB e imágenes cuando existen, con estados de carga, vacío, error y producto no disponible. La raíz del frontend conserva su redirección administrativa. Siguen pendientes variantes, empresas, promociones, disponibilidad por sucursal y consulta sin conexión; este incremento no completa el CU09 académico. No se presentan compras, inventario, pagos, reservas ni SaaS como funciones del MVP.
 
 ## Estructura
 
@@ -24,6 +24,7 @@ vestinova-mvp/
     tests_postgres/       # Migración y persistencia sobre PostgreSQL temporal
   frontend/
     src/app/auth/         # Acceso, sesión, guardas e interceptor
+    src/app/catalog/      # Catálogo público, búsqueda, paginación y detalle
     src/app/layout/       # Navegación y sesión administrativa
     src/app/products/     # Listar, registrar y editar
   mobile/
@@ -85,13 +86,15 @@ npm.cmd start
 
 | Revisión | Dirección |
 | --- | --- |
+| Catálogo público | http://127.0.0.1:4201/catalogo |
+| Detalle público | `http://127.0.0.1:4201/catalogo/SLUG_REAL` |
 | Acceso del administrador | http://127.0.0.1:4201/admin/login |
 | Listado | http://127.0.0.1:4201/admin/productos |
 | Registro | http://127.0.0.1:4201/admin/productos/nuevo |
 | Edición | `http://127.0.0.1:4201/admin/productos/ID_REAL/editar` |
 | Documentación API | http://127.0.0.1:8001/docs |
 | Estado de PostgreSQL | http://127.0.0.1:8001/api/health/db |
-| Contrato público, sin pantalla | http://127.0.0.1:8001/api/catalogo/productos |
+| API del catálogo público | http://127.0.0.1:8001/api/catalogo/productos |
 
 El frontend usa URLs relativas `/api` y su proxy local apunta al puerto 8001. Estos puertos permiten conservar los servidores heredados sin confundir ambos proyectos.
 
@@ -131,6 +134,6 @@ Las pruebas cubren reglas de contraseña nueva, compatibilidad de acceso, revoca
 
 La migración `0001_base` crea administradores, sesiones y productos, con claves, índices y restricciones. Esta implementación no requiere procedimientos, triggers ni datos heredados. No usar `create_all()` para instalar la aplicación ni editar una migración ya aplicada: añadir la siguiente revisión Alembic cuando cambie el esquema.
 
-El repositorio Git local se inicializó únicamente aquí. No se configuró publicación ni se hizo push. Para cada avance incluir código, pruebas, migraciones, documentación y archivos de dependencias que necesite ese estado ejecutable. Una ruta o importación nunca debe referenciar un archivo omitido del commit. El primer avance propuesto es este MVP completo de acceso y productos; las siguientes entregas pueden añadir catálogo y detalle públicos sobre el contrato compartido. No se crean copias ni ZIP por entrega.
+El repositorio Git local se inicializó únicamente aquí. No se configuró publicación ni se hizo push durante la preparación original. Para cada avance incluir código, pruebas, migraciones, documentación y archivos de dependencias que necesite ese estado ejecutable. Una ruta o importación nunca debe referenciar un archivo omitido del commit. El MVP de acceso y productos ya cuenta con el primer incremento del catálogo y detalle públicos sobre el contrato compartido. Las ampliaciones académicas de CU09 siguen pendientes. No se crean copias ni ZIP por entrega.
 
 Referencias técnicas: [Angular: compatibilidad](https://angular.dev/reference/versions), [FastAPI: JWT y hash](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/), [Alembic: migraciones](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
