@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { CatalogDetailPage } from './catalog-detail';
+import { CatalogOfflineStoreService } from './catalog-offline-store.service';
 import { CatalogProduct } from './catalog.models';
 
 const PRODUCT: CatalogProduct = {
@@ -22,6 +23,7 @@ describe('Detalle público del catálogo', () => {
       imports: [CatalogDetailPage],
       providers: [
         provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
+        { provide: CatalogOfflineStoreService, useValue: { read: vi.fn().mockResolvedValue(null) } },
         { provide: ActivatedRoute, useValue: { paramMap: params.asObservable() } },
       ],
     }).compileComponents();
@@ -51,6 +53,7 @@ describe('Detalle público del catálogo', () => {
     expect(description?.querySelector('strong')).toBeNull();
     expect(root.querySelector('vn-catalog-image')).not.toBeNull();
     expect(root.querySelector('a')?.getAttribute('href')).toBe('/catalogo');
+    expect(root.querySelector('.catalog-local-notice')).toBeNull();
   });
 
   it('presenta un 404 como producto no disponible sin reintentar ni mostrar detalles internos', async () => {
@@ -68,12 +71,13 @@ describe('Detalle público del catálogo', () => {
     http.expectNone('/api/catalogo/productos/camisa-de-lino');
   });
 
-  it('permite reintentar una conexión fallida sin confundirla con producto inexistente', async () => {
+  it('informa que no hay copia tras un fallo de conexión y permite reintentar online', async () => {
     const { fixture, component, root } = await setup();
     http.expectOne('/api/catalogo/productos/camisa-de-lino').error(new ProgressEvent('error'));
+    await vi.waitFor(() => expect(component.error()).toContain('No hay un catálogo descargado'));
     fixture.detectChanges();
     expect(component.notFound()).toBe(false);
-    expect(root.querySelector('[role="alert"]')?.textContent).toContain('No pudimos conectar');
+    expect(root.querySelector('[role="alert"]')?.textContent).toContain('No hay un catálogo descargado');
     http.expectNone('/api/catalogo/productos/camisa-de-lino');
     (root.querySelector('button') as HTMLButtonElement).click();
     fixture.detectChanges();

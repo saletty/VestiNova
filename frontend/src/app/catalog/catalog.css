@@ -6,6 +6,15 @@
 .catalog-header nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--vn-emerald); font-size: 13px; font-weight: 600; text-underline-offset: 6px; }
 .catalog-main { flex: 1; width: min(100%, 1248px); margin-inline: auto; padding: 54px 24px 64px; }
 .catalog-main:focus { outline: none; }
+.catalog-download { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px 24px; margin-bottom: 38px; padding: 22px; border: 1px solid #b6cdbd; border-radius: 10px; background: var(--vn-soft); }
+.catalog-download h2 { margin: 0 0 7px; color: var(--vn-coal); font-size: 15px; font-weight: 600; }
+.catalog-download p { margin: 0; color: var(--vn-muted); font-size: 12px; line-height: 1.7; }
+.catalog-download__message { grid-column: 1 / -1; }
+.catalog-download .vn-alert { padding: 10px 14px; color: var(--vn-danger); }
+.catalog-download .catalog-pwa-status { padding-top: 12px; border-top: 1px solid #cbdcce; }
+.catalog-local-notice { margin: 0 0 24px; padding: 16px 20px; border: 1px solid #b6cdbd; border-left: 4px solid var(--vn-emerald); border-radius: 7px; background: var(--vn-soft); color: var(--vn-text); font-size: 13px; line-height: 1.8; }
+.catalog-local-notice p { margin: 0; }
+.catalog-local-date { color: var(--vn-muted); }
 .catalog-footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px max(24px, calc((100vw - 1200px) / 2)); border-top: 1px solid var(--vn-line); color: var(--vn-muted); font-size: 12px; }
 .catalog-footer > span:first-child { color: var(--vn-coal); font-family: var(--vn-serif); font-size: 17px; }
 .catalog-skip, .catalog-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -49,6 +58,7 @@
 .catalog-detail__description { margin: 0; color: var(--vn-muted); line-height: 1.9; white-space: pre-wrap; overflow-wrap: anywhere; }
 @media (max-width: 1000px) { .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; } }
 @media (max-width: 760px) {
+  .catalog-download { grid-template-columns: 1fr; padding: 18px; }
   .catalog-main { padding-block: 34px 44px; }
   .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .catalog-detail__product { grid-template-columns: 1fr; gap: 16px; }

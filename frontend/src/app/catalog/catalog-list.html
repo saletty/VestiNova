@@ -19,6 +19,20 @@
     <button type="button" class="vn-button" (click)="clear()">Limpiar</button>
   </form>
 
+  @if (!loading() && source() === 'local') {
+    <aside class="catalog-local-notice" role="status">
+      <strong>Copia local</strong>
+      @if (downloadedAt(); as downloaded) {
+        <span class="catalog-local-date"> · Última descarga:
+          <time [attr.datetime]="downloaded">{{ downloaded | date:'dd/MM/yyyy HH:mm':'-0400' }}</time> (hora de Bolivia).
+        </span>
+      } @else {
+        <span class="catalog-local-date"> · Fecha de descarga no disponible.</span>
+      }
+      <p>La información puede estar desactualizada. Conéctate para consultar el catálogo actual.</p>
+    </aside>
+  }
+
   <section class="catalog-results" aria-labelledby="catalog-results-title" [attr.aria-busy]="loading()">
     <h2 id="catalog-results-title" class="catalog-sr-only">Prendas del catálogo</h2>
     @if (loading()) {
@@ -41,6 +55,9 @@
           <h3>Sin coincidencias</h3>
           <p>Prueba otro nombre o limpia la búsqueda.</p>
           <button type="button" class="vn-button" (click)="clear()">Limpiar búsqueda</button>
+        } @else if (source() === 'local') {
+          <h3>La copia descargada no contiene prendas</h3>
+          <p>Conéctate para consultar y descargar el catálogo actualizado.</p>
         } @else {
           <h3>No hay prendas publicadas</h3>
           <p>Vuelve más adelante para consultar el catálogo.</p>

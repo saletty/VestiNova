@@ -11,11 +11,12 @@
 - Listado de productos con búsqueda, visibilidad y paginación real; registro y edición parcial con persistencia, validaciones y precios decimales.
 - Endpoints públicos que solo devuelven productos activos y contrato compartido para catálogo/detalle.
 - Primer incremento de CU09 en la rama `miguel`: pantallas públicas `/catalogo` y `/catalogo/{slug}`, búsqueda por nombre, paginación de servidor, precios BOB, imágenes opcionales y estados de carga, vacío, error y producto no disponible.
+- Incremento limitado de CU14: descarga explícita del catálogo público completo en IndexedDB, consulta local con fecha y preparación del shell mediante PWA. No incluye datos por empresa/usuario ni completa el CU14 académico. Alcance y procedimiento de comprobación en [CU14_OFFLINE.md](CU14_OFFLINE.md).
 - Interfaz administrativa marfil/carbón/esmeralda, formularios con etiquetas, foco visible, estados reales y adaptación a móvil.
 - Política centralizada para contraseñas nuevas: 8–128 caracteres, mayúscula, minúscula, número y carácter especial. Mensaje exacto solicitado; login y hashes previos conservados.
 - `.gitignore` comprobado: excluye credenciales, entorno virtual y dependencias; no excluye archivos necesarios para reproducir la aplicación.
 
-## Comprobaciones
+## Comprobaciones de la base inicial
 
 | Comprobación | Resultado |
 | --- | --- |
@@ -27,7 +28,7 @@
 | Base operativa nueva | `/api/health/db` responde `ok` sobre `vestinova_mvp`; catálogo inicialmente vacío, sin productos ficticios. |
 | Datos anteriores | No se accedió ni se escribió en `vestinova`; el código heredado no se modificó durante esta implementación nueva. |
 
-Las pruebas automáticas de UI usan DOM, no capturas visuales de un navegador real. La adaptación móvil está implementada en CSS; queda revisión visual manual al probar los datos propios.
+Las comprobaciones iniciales de UI usaron DOM. El incremento de CU14 añade una prueba de navegador real y capturas de escritorio/móvil con fixtures; la revisión manual con datos propios sigue siendo útil.
 
 ## Verificación del primer incremento de CU09
 
@@ -39,9 +40,25 @@ Comprobaciones ejecutadas el 25 de octubre de 2026 en la rama `miguel`, con Node
 
 No se añadieron datos de demostración, dependencias ni cambios en autenticación, pantallas administrativas, esquema de base de datos o diagramas ICONIX. No se realizaron commits ni push. La comprobación visual con los productos propios en un navegador queda como revisión manual.
 
+## Verificación del incremento público de CU14
+
+Comprobaciones ejecutadas el 25 de octubre de 2026 en `miguel`, con Node.js 24.15.0:
+
+| Comprobación | Resultado |
+| --- | --- |
+| `npm.cmd test` | 168 pruebas correctas en 15 archivos, incluidas IndexedDB, rollback, descargas paginadas y fallidas, consulta local, fechas, rechazos de autorización y preparación PWA. |
+| `npm.cmd run build` | Compilación de producción correcta. |
+| `npm.cmd run test:pwa:config` | 20 recursos precargados verificados; navegación offline solo de catálogo y sin caché de respuestas API. |
+| `npm.cmd run test:pwa` | 10 comprobaciones correctas en Edge sin ventana, con perfil temporal, API de fixtures y servidor de la aplicación detenido durante el recorrido offline. |
+| Revisión visual | Capturas de catálogo en escritorio y detalle en móvil, con los avisos locales y la identidad visual de VestiNova. |
+
+La prueba de navegador descargó 121 productos de prueba en dos páginas y verificó que una actualización fallida conserva productos y fecha; un `403` no permite consultar la copia; el catálogo y un detalle no visitado se abren sin red; otra pestaña conserva la consulta; Cache Storage no contiene respuestas API; y la ausencia de copia tiene mensaje propio. Los fixtures solo existen en el servidor temporal de la prueba: no se utilizó FastAPI ni PostgreSQL, ni se insertaron registros operativos.
+
+Los módulos administrativos, el backend, las migraciones y los diagramas ICONIX permanecen sin cambios. No se hicieron commits ni push. El [procedimiento manual](CU14_OFFLINE.md) explica cómo comprobar el build PWA desde el navegador y diferencia este incremento público del CU14 académico completo.
+
 ## Pendiente
 
-- CU09 académico completo: integración con categorías/variantes de CU05, promociones de CU06, disponibilidad por variante/sucursal de CU08, aislamiento empresarial y copia local autorizada de CU14. El catálogo público actual constituye únicamente el primer incremento conectado.
+- CU09 académico completo: integración con categorías/variantes de CU05, promociones de CU06, disponibilidad por variante/sucursal de CU08, aislamiento empresarial y copia local autorizada por empresa/usuario de CU14. La copia pública del incremento limitado de CU14 no cubre esas integraciones.
 - Prueba manual con productos reales: crear, editar, recargar, salir y comprobar que una URL privada exige nuevo acceso. No se insertaron registros de muestra en la base operativa.
 - Funciones fuera del alcance inicial: cambio/recuperación de contraseña, altas de administradores desde la web, gestión de roles, carga de archivos, stock, compras, ventas, reservas y SaaS. No aparecen como disponibles.
 

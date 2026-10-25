@@ -30,6 +30,7 @@ describe('Contrato HTTP del catálogo público', () => {
     expect(request.request.params.get('limit')).toBe('20');
     expect(request.request.params.get('offset')).toBe('40');
     expect(request.request.headers.has('Authorization')).toBe(false);
+    expect(request.request.headers.get('ngsw-bypass')).toBe('true');
     request.flush({ items: [], total: 0, limit: 20, offset: 40 });
     expect(TestBed.inject(AuthService).token()).toBe('sesion-administrativa-existente');
   });
@@ -49,6 +50,7 @@ describe('Contrato HTTP del catálogo público', () => {
     api.get('prenda/con espacio').subscribe({ error: error => status = error.status });
     const request = http.expectOne('/api/catalogo/productos/prenda%2Fcon%20espacio');
     expect(request.request.headers.has('Authorization')).toBe(false);
+    expect(request.request.headers.get('ngsw-bypass')).toBe('true');
     request.flush({ detail: 'Producto no encontrado.' }, { status: 404, statusText: 'Not Found' });
     expect(status).toBe(404);
     expect(TestBed.inject(AuthService).token()).toBe('sesion-administrativa-existente');

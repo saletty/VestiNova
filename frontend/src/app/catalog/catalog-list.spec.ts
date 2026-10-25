@@ -73,6 +73,7 @@ describe('Catálogo público de prendas', () => {
     expect(card.getAttribute('aria-label')).toContain('Camisa de lino');
     expect(card.querySelector('vn-catalog-image')).not.toBeNull();
     expect(root.querySelector('label[for="catalog-search"]')).not.toBeNull();
+    expect(root.querySelector('.catalog-local-notice')).toBeNull();
   });
 
   it('busca por nombre en el servidor, recorta espacios y reinicia la paginación', async () => {
