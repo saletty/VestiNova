@@ -67,8 +67,21 @@ Los módulos administrativos, el backend, las migraciones y los diagramas ICONIX
 
 Reglas y límites en [CONTRATO_INVENTARIO.md](CONTRATO_INVENTARIO.md).
 
+## Verificación del primer incremento de CU11
+
+- Dominio, servicio y contratos nuevos en `backend/app/reservations/`, basados en la ficha oficial transcrita por el usuario y sin modificar CU08, CU09 ni CU14.
+- `python -m pytest tests/reservations -q --tb=short`: 101 casos correctos, 42 de dominio y 59 de servicio.
+- `python -m pytest tests -q --tb=short`: 367 pruebas backend correctas; `npm.cmd test`: 168 pruebas frontend correctas.
+- Confirmación central, consulta, cancelación, vencimiento explícito y validación de solicitudes offline. Configuración de plazo obligatoria, sin duración predeterminada ni anticipos inventados.
+- Se verificaron aislamiento por empresa/sucursal/cliente, stock insuficiente, rollback conjunto, reenvíos idempotentes por UUID, código único, liberación una sola vez y concurrencia sobre la última unidad con dobles de prueba.
+- Reutiliza referencias y `StockBalance` de CU08; el contrato de inventario compromete unidades sin descontar el físico. Ningún adaptador ficticio se instala en producción.
+- Pendientes: persistencia y concurrencia PostgreSQL, autorización real, API/UI, cola y almacenamiento offline/CU15, proceso automático de vencimiento e integración con CU16. No se crearon migraciones ni se hicieron commits, push o integración de ramas.
+
+Fuente, reglas y límites en [CONTRATO_RESERVAS.md](CONTRATO_RESERVAS.md).
+
 ## Pendiente
 
+- CU11 completo: conectar el núcleo ya probado con persistencia y autorización reales, API/UI, almacenamiento local y sincronización de CU15, automatización de vencimientos y atención de CU16. Alcance del incremento en [CONTRATO_RESERVAS.md](CONTRATO_RESERVAS.md).
 - CU09 académico completo: integración con categorías/variantes de CU05, promociones de CU06, disponibilidad por variante/sucursal de CU08, aislamiento empresarial y copia local autorizada por empresa/usuario de CU14. La copia pública del incremento limitado de CU14 no cubre esas integraciones.
 - Prueba manual con productos reales: crear, editar, recargar, salir y comprobar que una URL privada exige nuevo acceso. No se insertaron registros de muestra en la base operativa.
 - Funciones fuera del alcance inicial: cambio/recuperación de contraseña, altas de administradores desde la web, gestión de roles, carga de archivos, stock, compras, ventas, reservas y SaaS. No aparecen como disponibles.
