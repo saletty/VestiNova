@@ -65,6 +65,7 @@ export class ReservationDraftPage {
   ngOnInit(): void {
     this.restoreDraft();
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      this.requestVersion++;
       const slug = params.get('slug');
       this.product.set(null);
       this.availability.set(null);
