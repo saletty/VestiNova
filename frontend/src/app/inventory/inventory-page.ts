@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { CompanyService } from '../company/company.service';
 import {
   InventoryApiService, InventoryBalance, InventoryBranch,
@@ -51,6 +51,8 @@ export class InventoryPage {
   ngOnInit(): void {
     this.companies.changes$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.generation++;
+      this.loadingBranches.set(false);
+      this.loadingInventory.set(false);
       this.branches.set([]);
       this.selectedBranch.set(null);
       this.balances.set({ items: [], total: 0, offset: 0, limit: 100 });
@@ -70,6 +72,7 @@ export class InventoryPage {
     this.api.branches().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: branches => {
         if (current !== this.generation) return;
+        this.loadingBranches.set(false);
         this.branches.set(branches.filter(branch => branch.activo));
         if (!this.branches().some(branch => branch.id === this.selectedBranch())) {
           this.selectedBranch.set(this.branches()[0]?.id ?? null);
@@ -77,8 +80,7 @@ export class InventoryPage {
         if (this.selectedBranch() !== null) this.loadInventory();
         else this.loadingInventory.set(false);
       },
-      error: error => { if (current === this.generation) this.error.set(inventoryMessage(error)); },
-      complete: () => { if (current === this.generation) this.loadingBranches.set(false); },
+      error: error => { if (current === this.generation) { this.error.set(inventoryMessage(error)); this.loadingBranches.set(false); } },
     });
   }
 
@@ -142,7 +144,7 @@ export class InventoryPage {
       tipo: values.tipo,
       cantidad: quantity,
       motivo: values.motivo.trim(),
-    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false))).subscribe({
       next: () => {
         if (revision !== this.companies.revision() || branchId !== this.selectedBranch()) return;
         this.success.set('Movimiento registrado y saldo actualizado correctamente.');
@@ -152,7 +154,6 @@ export class InventoryPage {
       error: error => {
         if (revision === this.companies.revision()) this.error.set(inventoryMessage(error));
       },
-      complete: () => this.saving.set(false),
     });
   }
 }
