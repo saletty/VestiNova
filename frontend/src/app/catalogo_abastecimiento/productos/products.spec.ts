@@ -130,7 +130,10 @@ describe('Formulario de producto', () => {
     http.expectOne('/api/admin/categorias').flush([]);
     return { fixture, component: fixture.componentInstance, root: fixture.nativeElement as HTMLElement, routeParams };
   }
-  afterEach(() => http?.verify());
+  afterEach(() => {
+    http?.match('/api/admin/categorias').forEach(request => { if (!request.cancelled) request.flush([]); });
+    http?.verify();
+  });
 
   it('asocia errores y etiquetas y no envía un formulario inválido', async () => {
     const { component, fixture, root } = await setup();
