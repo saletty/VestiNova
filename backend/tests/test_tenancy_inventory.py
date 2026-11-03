@@ -10,7 +10,7 @@ from app.models import (
     AccesoSucursal, Administrador, Empresa, Existencia, MembresiaEmpresa,
     MovimientoInventario, Producto, Sucursal, VarianteProducto,
 )
-from tests.conftest import TEST_PASSWORD
+from tests.conftest import TEST_PASSWORD, activate_test_subscription
 
 
 def login(client, account):
@@ -30,6 +30,7 @@ def scope(client, administrator, auth, session_factory):
         platform = Administrador(nombre="Solo plataforma", correo="plataforma@vestinova.test", password_hash=administrator.password_hash, activo=True, es_superadministrador=True)
         db.add_all([owner_b, operator, platform])
         db.flush()
+        activate_test_subscription(db, b.id)
         db.add_all([
             MembresiaEmpresa(administrador_id=owner_b.id, empresa_id=b.id, rol="ADMINISTRADOR", activo=True),
             MembresiaEmpresa(administrador_id=operator.id, empresa_id=a.id, rol="OPERADOR", activo=True),
