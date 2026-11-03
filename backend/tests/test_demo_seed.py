@@ -32,7 +32,7 @@ def _counts(db):
 
 
 def test_demo_seed_is_idempotent_and_isolates_tenants(session_factory):
-    with session_factory().begin() as db:
+    with session_factory() as db, db.begin():
         for code, limit in (("BASICO", 2), ("PROFESIONAL", 10)):
             db.add(PlanSaaS(codigo=code, nombre=code, max_sucursales=limit,
                             prestaciones=[], activo=True))
