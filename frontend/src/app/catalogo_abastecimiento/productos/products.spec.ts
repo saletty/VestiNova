@@ -145,7 +145,7 @@ describe('Formulario de producto', () => {
 
   it('crea una sola vez mientras espera, conserva decimales y confirma solo tras respuesta', async () => {
     const { component, fixture, root } = await setup();
-    component.form.setValue({ nombre: '  Camisa de lino  ', descripcion: ' Lino natural. ', precio: '149,9', slug: '', imagen_url: '', activo: true });
+    component.form.setValue({ nombre: '  Camisa de lino  ', categoria_id: null, descripcion: ' Lino natural. ', precio: '149,9', slug: '', imagen_url: '', activo: true });
     component.submit();
     component.submit();
     fixture.detectChanges();
