@@ -92,7 +92,9 @@ def test_public_catalog_shape_and_slug_contract_remain_compatible(client, scope)
     product(client, scope.bh, "Privado B", activo=False)
     page = client.get("/api/catalogo/productos?limit=1&offset=1").json()
     assert page == {"items": [a], "total": 2, "limit": 1, "offset": 1}
-    assert set(a) == {"id", "slug", "nombre", "descripcion", "precio", "moneda", "imagen_url", "activo", "creado_en", "actualizado_en"}
+    assert set(a) == {"id", "slug", "nombre", "categoria_id", "categoria_nombre", "descripcion",
+                      "precio", "precio_promocional", "promocion_nombre", "moneda", "imagen_url",
+                      "activo", "creado_en", "actualizado_en"}
     assert a["precio"] == "150.90" and a["moneda"] == "BOB"
     assert client.get(f"/api/catalogo/productos/{b['slug']}").json() == b
 
