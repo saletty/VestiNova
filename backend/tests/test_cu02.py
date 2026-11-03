@@ -9,7 +9,7 @@ from app.models import Administrador, Empresa, MembresiaEmpresa, RolEmpresa, Suc
 from app.autenticacion_usuarios.permissions import ensure_company_roles
 from app.password_policy import PASSWORD_POLICY_MESSAGE
 from app.security import verify_password
-from tests.conftest import TEST_PASSWORD
+from tests.conftest import TEST_PASSWORD, activate_test_subscription
 
 
 NEW_PASSWORD = "  NuevaClave!2026  "
@@ -53,6 +53,7 @@ def cu02(client, administrator, auth, session_factory):
         platform = Administrador(nombre="Plataforma sin empresa", correo=f"platform-{uuid4().hex}@vestinova.test", password_hash=administrator.password_hash, activo=True, es_superadministrador=True)
         db.add_all([b, owner_b, platform])
         db.flush()
+        activate_test_subscription(db, b.id)
         ensure_company_roles(db, b.id)
         other_roles = {entry.codigo_sistema: entry.id for entry in db.scalars(select(RolEmpresa).where(RolEmpresa.empresa_id == b.id)).all()}
         db.add(MembresiaEmpresa(administrador_id=owner_b.id, empresa_id=b.id, rol="ADMINISTRADOR", rol_empresa_id=other_roles["ADMINISTRADOR"], activo=True))
