@@ -76,7 +76,7 @@ jobs:
                   second = tuple(session.scalar(select(func.count()).select_from(model))
                                  for model in (Administrador, Empresa, Producto, Existencia, MovimientoInventario))
               assert first == second, (first, second)
-              assert first[:4] == (7, 2, 6, 15), first
+              assert first[:4] == (7, 3, 6, 15), first
               print("PostgreSQL demo: migraciones, poblado y reejecución sin duplicados, OK.")
           finally:
               engine.dispose()
