@@ -338,7 +338,7 @@ def test_platform_and_customer_accounts_do_not_receive_company_management_access
 
 
 def test_reactivation_cannot_regrant_a_branch_outside_the_managers_authority(client, cu02):
-    capabilities = sorted(set(MANAGEMENT_PERMISSIONS + READ_PERMISSIONS))
+    capabilities = sorted(set(MANAGEMENT_PERMISSIONS + READ_PERMISSIONS + ["postventa.gestionar", "postventa.consultar", "promociones.consultar"]))
     profile = role(client, cu02.ah, capabilities, "Gestor con sucursal limitada")
     manager = person(client, cu02, role_id=profile["id"], sucursal_ids=[cu02.a1.id])
     headers = login(client, manager["correo"])
@@ -354,7 +354,7 @@ def test_reactivation_cannot_regrant_a_branch_outside_the_managers_authority(cli
 
 
 def test_reactivation_preserves_historical_inactive_branches_within_authority(client, cu02):
-    capabilities = sorted(set(MANAGEMENT_PERMISSIONS + READ_PERMISSIONS))
+    capabilities = sorted(set(MANAGEMENT_PERMISSIONS + READ_PERMISSIONS + ["postventa.gestionar", "postventa.consultar", "promociones.consultar"]))
     profile = role(client, cu02.ah, capabilities, "Gestor de concesiones historicas")
     manager = person(client, cu02, role_id=profile["id"], sucursal_ids=[cu02.a1.id])
     headers = login(client, manager["correo"])
