@@ -127,6 +127,7 @@ describe('Formulario de producto', () => {
     navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     const fixture = TestBed.createComponent(ProductFormPage);
     fixture.detectChanges();
+    http.expectOne('/api/admin/categorias').flush([]);
     return { fixture, component: fixture.componentInstance, root: fixture.nativeElement as HTMLElement, routeParams };
   }
   afterEach(() => http?.verify());
