@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard, guestGuard, platformGuard } from './autenticacion_usuarios/autenticacion/auth.guards';
-import { cashierGuard, managerGuard, adminHomeGuard, companyAdminGuard, companyGuard, productsGuard } from './organizacion_empresarial/empresa/company.guards';
+import { cashierGuard, managerGuard, adminHomeGuard, companyAdminGuard, companyGuard, productsGuard, operationalStaffGuard } from './organizacion_empresarial/empresa/company.guards';
 import { customerGuard } from './compras_reservas/clientes/customer.guards';
 import { productFormLeaveGuard } from './catalogo_abastecimiento/productos/product-form.guard';
 import { variantLeaveGuard } from './catalogo_abastecimiento/productos/variant-page.guard';
@@ -62,23 +62,23 @@ export const routes: Routes = [
       { path: 'conciliacion', canActivate: [managerGuard], loadComponent: () => import('./operacion_sin_conexion/sincronizacion/reconciliation-page').then(m => m.ReconciliationPage) },
       { path: 'reportes-comerciales', canActivate: [staffPermissionGuard], data: { permission: 'reportes.consultar' }, loadComponent: () => import('./reportes_comerciales/reports-page').then(m => m.ReportsPage) },
       {
-        path: 'catalogo-consulta', canActivate: [companyGuard],
+        path: 'catalogo-consulta', canActivate: [staffPermissionGuard], data: { permission: 'catalogo.consultar' },
         loadComponent: () => import('./catalogo_publico/catalogo/admin-catalog-page').then(m => m.AdminCatalogPage),
         children: [
           { path: '', pathMatch: 'full', loadComponent: () => import('./catalogo_publico/catalogo/catalog-list').then(m => m.CatalogListPage) },
           { path: ':slug', loadComponent: () => import('./catalogo_publico/catalogo/catalog-detail').then(m => m.CatalogDetailPage) },
         ],
       },
-      { path: 'inventario', canActivate: [companyGuard], loadComponent: () => import('./inventario/inventory-page').then(m => m.InventoryPage) },
+      { path: 'inventario', canActivate: [staffPermissionGuard], data: { permission: 'inventario.consultar' }, loadComponent: () => import('./inventario/inventory-page').then(m => m.InventoryPage) },
       { path: 'sucursales', canActivate: [staffPermissionGuard], data: { permission: 'sucursales.gestionar' }, loadComponent: () => import('./organizacion_empresarial/sucursales/branch-page').then(m => m.BranchPage) },
       { path: 'usuarios', canActivate: [staffPermissionGuard], canDeactivate: [staffLeaveGuard], data: { permission: 'usuarios.consultar' }, loadComponent: () => import('./autenticacion_usuarios/personal/staff-users-page').then(m => m.StaffUsersPage) },
       { path: 'roles', canActivate: [staffPermissionGuard], canDeactivate: [staffLeaveGuard], data: { permission: 'roles.consultar' }, loadComponent: () => import('./autenticacion_usuarios/personal/staff-roles-page').then(m => m.StaffRolesPage) },
       { path: 'auditoria', canActivate: [staffPermissionGuard], data: { permission: 'auditoria.consultar' }, loadComponent: () => import('./organizacion_empresarial/auditoria/audit-page').then(m => m.AuditPage) },
-      { path: 'reservas', canActivate: [companyGuard], loadComponent: () => import('./compras_reservas/reservas/reservation-staff-page').then(m => m.ReservationStaffPage) },
+      { path: 'reservas', canActivate: [operationalStaffGuard], loadComponent: () => import('./compras_reservas/reservas/reservation-staff-page').then(m => m.ReservationStaffPage) },
       { path: 'reportes-ia', canActivate: [staffPermissionGuard], data: { permission: 'reportes.ia.consultar' }, loadComponent: () => import('./analitica_ia/reports-page').then(m => m.ReportsPage) },
       { path: 'dashboard-predictivo', canActivate: [staffPermissionGuard], data: { permission: 'analitica.consultar' }, loadComponent: () => import('./analitica_ia/dashboard-page').then(m => m.DashboardPage) },
       { path: 'postventa', canActivate: [staffPermissionGuard], data: { permission: 'postventa.consultar' }, loadComponent: () => import('./compras_reservas/postventa/postventa-page').then(m => m.PostventaPage) },
-      { path: 'entregas-compras', canActivate: [companyGuard], loadComponent: () => import('./compras_reservas/compras/purchase-deliveries-page').then(m => m.PurchaseDeliveriesPage) },
+      { path: 'entregas-compras', canActivate: [operationalStaffGuard], loadComponent: () => import('./compras_reservas/compras/purchase-deliveries-page').then(m => m.PurchaseDeliveriesPage) },
       { path: 'promociones', canActivate: [staffPermissionGuard], data: { permission: 'promociones.consultar' }, loadComponent: () => import('./catalogo_abastecimiento/promociones/promotions-page').then(m => m.PromotionsPage) },
       { path: 'abastecimiento', canActivate: [staffPermissionGuard], data: { permission: 'abastecimiento.consultar' }, loadComponent: () => import('./catalogo_abastecimiento/abastecimiento/procurement-page').then(m => m.ProcurementPage) },
       { path: 'mi-plan', canActivate: [staffPermissionGuard], data: { permission: 'plan.consultar' }, loadComponent: () => import('./organizacion_empresarial/plataforma/my-plan-page').then(m => m.MyPlanPage) },

@@ -19,7 +19,7 @@ describe('Menú administrativo por rol efectivo de empresa', () => {
       active: active.asReadonly(),
       companies: computed(() => [active()]),
       hasPermission,
-      canViewProducts: () => ['ADMINISTRADOR', 'OPERADOR'].includes(active().rol) && hasPermission('catalogo.consultar'),
+      canViewProducts: () => hasPermission('catalogo.consultar') && hasPermission('catalogo.gestionar'),
       canManage: () => hasPermission('catalogo.gestionar'),
       canManageBranches: () => hasPermission('sucursales.gestionar'),
       canViewUsers: () => hasPermission('usuarios.consultar'),
@@ -48,7 +48,7 @@ describe('Menú administrativo por rol efectivo de empresa', () => {
     const root = fixture.nativeElement as HTMLElement;
     const links = () => [...root.querySelectorAll<HTMLAnchorElement>('.rail__nav a')]
       .map(link => ({ href: link.getAttribute('href'), text: link.textContent?.trim() }));
-    return { fixture, active, root, links };
+    return { fixture, active, root, links, user: auth.user };
   }
 
   it('Cajero solo ve sus operaciones y consulta el catálogo sin editar prendas', async () => {
@@ -61,7 +61,7 @@ describe('Menú administrativo por rol efectivo de empresa', () => {
     expect(urls).toContain('/admin/catalogo-consulta');
     expect(urls).toContain('/admin/acceso');
 
-    expect(urls).not.toContain('/admin/inventario');
+    expect(urls).toContain('/admin/inventario');
     expect(urls).not.toContain('/admin/productos');
     expect(urls).not.toContain('/admin/promociones');
     expect(urls).not.toContain('/admin/conciliacion');
@@ -70,6 +70,7 @@ describe('Menú administrativo por rol efectivo de empresa', () => {
     expect(urls).not.toContain('/admin/reportes-ia');
     expect(urls).not.toContain('/admin/dashboard-predictivo');
     expect(root.textContent).toContain('Consultar catálogo · solo lectura');
+    expect(root.textContent).toContain('Consultar existencias · solo lectura');
     expect(root.textContent).toContain('Operaciones de caja');
     expect(root.querySelector('.rail__brand')?.getAttribute('href')).toBe('/admin');
   });
@@ -118,11 +119,36 @@ describe('Menú administrativo por rol efectivo de empresa', () => {
     expect(urls).toContain('/admin/reportes-comerciales');
     expect(urls).not.toContain('/admin/reportes-ia');
     expect(urls).not.toContain('/admin/dashboard-predictivo');
-    const disabled = [...root.querySelectorAll<HTMLElement>('.rail__link--disabled')];
-    expect(disabled.map(item => item.textContent?.trim())).toEqual([
-      'Reportes con IA · CU21 (sin permiso)',
-      'Dashboard predictivo · CU22 (sin permiso)',
+    expect(root.querySelectorAll('.rail__link--disabled').length).toBe(0);
+    expect(root.textContent).not.toContain('CU21 (sin permiso)');
+    expect(root.textContent).not.toContain('CU22 (sin permiso)');
+  }); 
+  it('Superadministrador SaaS solo encuentra empresas y planes de plataforma', async () => {
+    const { fixture, user, links, root } = await setup();
+    user.set({ id: 2, nombre: 'SaaS', correo: 'saas@vestinova.test',
+      rol: 'ADMINISTRADOR', es_superadministrador: true });
+    fixture.detectChanges();
+    expect(links().map(link => link.href)).toEqual([
+      '/admin/plataforma/empresas',
+      '/admin/plataforma/planes',
     ]);
-    expect(disabled.every(item => item.getAttribute('aria-disabled') === 'true')).toBe(true);
+    expect(root.textContent).toContain('Plataforma VestiNova');
+    expect(root.textContent).not.toContain('Elegir empresa');
+    expect(root.textContent).not.toContain('Mi acceso');
+  });
+
+  it('Rol personalizado puede ver reportes IA por permiso, pero no el dashboard exclusivo de administrador', async () => {
+    const { fixture, active, links } = await setup();
+    active.set({ ...active(), rol: 'OPERADOR', permisos: [
+      'catalogo.consultar', 'reportes.consultar', 'reportes.ia.consultar',
+    ] });
+    fixture.detectChanges();
+    const urls = links().map(link => link.href);
+    expect(urls).toContain('/admin/catalogo-consulta');
+    expect(urls).toContain('/admin/reportes-comerciales');
+    expect(urls).toContain('/admin/reportes-ia');
+    expect(urls).not.toContain('/admin/dashboard-predictivo');
+    expect(urls).not.toContain('/admin/productos');
+    expect(urls).not.toContain('/admin/reservas');
   });
 });

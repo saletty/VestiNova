@@ -33,7 +33,7 @@ export class CompanyService {
   readonly error = signal<string | null>(null);
   readonly revision = signal(0);
   readonly canManage = computed(() => this.hasPermission('catalogo.consultar') && this.hasPermission('catalogo.gestionar'));
-  readonly canViewProducts = computed(() => ['ADMINISTRADOR', 'OPERADOR'].includes(this.active()?.rol ?? '') && this.hasPermission('catalogo.consultar'));
+  readonly canViewProducts = computed(() => this.hasPermissions(['catalogo.consultar', 'catalogo.gestionar']));
   readonly canViewUsers = computed(() => this.hasPermission('usuarios.consultar'));
   readonly canManageBranches = computed(() => this.hasPermission('sucursales.gestionar'));
   readonly canViewAudit = computed(() => this.hasPermission('auditoria.consultar'));

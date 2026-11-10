@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree, provideRouter } from '@angular/router';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { AuthService } from '../../autenticacion_usuarios/autenticacion/auth.service';
-import { adminHomeGuard, companyAdminGuard, companyGuard } from './company.guards';
+import { adminHomeGuard, companyAdminGuard, companyGuard, operationalStaffGuard } from './company.guards';
 import { COMPANY_KEY } from './company.service';
 
 describe('Rutas empresariales y permisos de escritura', () => {
@@ -37,7 +37,7 @@ describe('Rutas empresariales y permisos de escritura', () => {
   it('no permite abrir creación o edición con rol de operador', async () => {
     const result = run(companyAdminGuard);
     http.expectOne('/api/empresas').flush([{ id: 1, nombre: 'Empresa A', slug: 'a', activo: true, rol: 'OPERADOR' }]);
-    expect(TestBed.inject(Router).serializeUrl(await result as UrlTree)).toBe('/admin/productos?motivo=permiso');
+    expect(TestBed.inject(Router).serializeUrl(await result as UrlTree)).toBe('/admin/catalogo-consulta?motivo=permiso');
   });
 
   it('permite escritura solo tras validar una pertenencia administrativa', async () => {
@@ -55,7 +55,7 @@ describe('Rutas empresariales y permisos de escritura', () => {
     ['CAJERO', '/admin/caja'],
     ['ENCARGADO_SUCURSAL', '/admin/atencion-reservas'],
     ['ADMINISTRADOR', '/admin/productos'],
-    ['OPERADOR', '/admin/productos'],
+    ['OPERADOR', '/admin/catalogo-consulta'],
   ] as const)('abre el inicio correcto para el rol %s', async (role, expected) => {
     const result = run(adminHomeGuard);
     http.expectOne('/api/empresas').flush([
@@ -72,5 +72,22 @@ describe('Rutas empresariales y permisos de escritura', () => {
     ]);
     expect(TestBed.inject(Router).serializeUrl(await result as UrlTree)).toBe('/admin/empresa');
   });
+ 
+  it.each(['ADMINISTRADOR', 'ENCARGADO_SUCURSAL', 'CAJERO'] as const)(
+    'habilita operaciones de reservas y entregas para %s', async role => {
+      const result = run(operationalStaffGuard);
+      http.expectOne('/api/empresas').flush([{ id: 1, nombre: 'Moda Andina',
+        slug: 'demo-moda-andina', activo: true, rol: role }]);
+      expect(await result).toBe(true);
+    },
+  );
 
+  it('deniega reservas y entregas al operador sin rol operativo reconocido', async () => {
+    const result = run(operationalStaffGuard);
+    http.expectOne('/api/empresas').flush([{ id: 1, nombre: 'Moda Andina',
+      slug: 'demo-moda-andina', activo: true, rol: 'OPERADOR',
+      permisos: ['catalogo.consultar'] }]);
+    expect(TestBed.inject(Router).serializeUrl(await result as UrlTree))
+      .toBe('/admin/acceso?motivo=permiso');
+  });
 });

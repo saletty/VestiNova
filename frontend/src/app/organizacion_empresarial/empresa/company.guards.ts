@@ -50,7 +50,7 @@ export const companyAdminGuard: CanActivateFn = () => {
   return auth.ensureSession().pipe(
     switchMap(user => user ? companies.ensureForUser(user.id).pipe(map(() => {
       if (!companies.active()) return router.createUrlTree(['/admin/empresa']);
-      return companies.canManage() ? true : router.createUrlTree([companies.canViewProducts() ? '/admin/productos' : '/admin/acceso'], { queryParams: { motivo: 'permiso' } });
+      return companies.canManage() ? true : router.createUrlTree([companies.hasPermission('catalogo.consultar') ? '/admin/catalogo-consulta' : '/admin/acceso'], { queryParams: { motivo: 'permiso' } });
     })) : of(router.createUrlTree(['/admin/login']))),
     catchError(() => of(router.createUrlTree(['/admin/empresa']))),
   );
@@ -95,6 +95,24 @@ export const managerGuard: CanActivateFn = () => {
       const current = companies.active();
       if (!current) return router.createUrlTree(['/admin/empresa']);
       return current.rol === 'ENCARGADO_SUCURSAL'
+        ? true : router.createUrlTree(['/admin/acceso'], { queryParams: { motivo: 'permiso' } });
+    })) : of(router.createUrlTree(['/admin/login']))),
+    catchError(() => of(router.createUrlTree(['/admin/empresa']))),
+  );
+};
+
+/** Reservas y entrega de compras: aún no tienen códigos de permiso propios en CU01.
+ * Mantener acceso restringido a los tres perfiles operativos reconocidos por el backend.
+ */
+export const operationalStaffGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const companies = inject(CompanyService);
+  const router = inject(Router);
+  return auth.ensureSession().pipe(
+    switchMap(user => user ? companies.ensureForUser(user.id).pipe(map(() => {
+      const company = companies.active();
+      if (!company) return router.createUrlTree(['/admin/empresa']);
+      return ['ADMINISTRADOR', 'ENCARGADO_SUCURSAL', 'CAJERO'].includes(company.rol)
         ? true : router.createUrlTree(['/admin/acceso'], { queryParams: { motivo: 'permiso' } });
     })) : of(router.createUrlTree(['/admin/login']))),
     catchError(() => of(router.createUrlTree(['/admin/empresa']))),
